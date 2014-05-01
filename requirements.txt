@@ -1,0 +1,13 @@
+argparse==1.2.1
+distribute==0.6.24
+gapy==0.0.9
+google-api-python-client==1.0
+httplib2==0.8
+mock==1.0.1
+py==1.4.20
+pyOpenSSL==0.14
+pytest==2.5.2
+python-gflags==2.0
+requests==2.2.1
+urllib3==1.8
+wsgiref==0.1.2

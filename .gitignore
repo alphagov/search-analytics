@@ -1,2 +1,6 @@
-client_secrets.json
 *.pyc
+ENV
+build
+cache
+client_secrets.json
+generated_secrets
