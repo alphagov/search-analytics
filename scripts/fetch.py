@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 def fetch(outfile):
     if os.path.exists(outfile):
         raise ValueError("Output file %r already exists" % outfile)
-    days_ago_buckets = [7]
+    days_ago_buckets = [14]
     traffic_by_page = fetch_page_traffic(
         datetime.date.today(),
         days_ago_buckets,
