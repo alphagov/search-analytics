@@ -15,7 +15,7 @@ def page_info_docs(traffic_by_page):
     for page, info in traffic_by_page.iteritems():
         action = {
             "index": {
-                "_type": "page_traffic",
+                "_type": "page-traffic",
                 "_id": page,
             }
         }

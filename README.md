@@ -43,9 +43,9 @@ Fetching data
 
 Ensure that the virtualenv is activated, and then run:
 
-    PYTHONPATH=. python scripts/fetch.py page_traffic.dump
+    PYTHONPATH=. python scripts/fetch.py page-traffic.dump
 
-This will generate a file called `page_traffic.dump`, which is in elasticsearch
+This will generate a file called `page-traffic.dump`, which is in elasticsearch
 bulk load format, and can be loaded into the search index using the `bulk_load`
 script in rummager.  This contains information on the amount of traffic each
 page on GOV.UK got (after some normalisation).
