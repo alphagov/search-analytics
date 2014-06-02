@@ -83,7 +83,7 @@ class GAClient(object):
             self.profiles = {
                 'search': get_profile(
                     self.service, 'www.gov.uk', 'UA-26179049-1',
-                    'X. GOV.UK (Entire site - Search analysis)'),
+                    'Q. Site search (entire site with query strings)'),
             }
         except AccessTokenRefreshError:
             logger.exception(
