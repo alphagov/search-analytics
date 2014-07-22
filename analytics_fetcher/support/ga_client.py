@@ -2,16 +2,12 @@
 
 """
 
-from .dirs import CACHE_DIR
-from .ga_auth import perform_auth
-from .ga_profile import get_profile
+from analytics_fetcher.support.auth import open_client
+from analytics_fetcher.support.cache_manager import cached_iterator
 from apiclient.errors import HttpError
 from datetime import datetime, timedelta
 from oauth2client.client import AccessTokenRefreshError
-import hashlib
-import json
 import logging
-import os
 import time
 
 
@@ -22,46 +18,19 @@ class GAError(Exception):
     pass
 
 
-def cached_iterator(fn):
-    cache_dir = os.path.join(CACHE_DIR, 'gacache')
-    if not os.path.isdir(cache_dir):
-        logger.info("Making cache dir %s", cache_dir)
-        os.makedirs(cache_dir)
-
-    def wrapped(self, *args, **kwargs):
-        assert isinstance(self, GAClient)
-        h = hashlib.sha1(repr([args, kwargs])).hexdigest()
-        path = os.path.join(cache_dir, h)
-        if os.path.exists(path):
-            logger.info("Serving GA request from cache")
-            with open(path) as fobj:
-                for row in fobj:
-                    yield json.loads(row)
-            return
-        logger.info("Performing GA request %s", path)
-        sampled = False
-        try:
-            with open(path + '.tmp', 'wb') as fobj:
-                for result in fn(self, *args, **kwargs):
-                    if result.get('sampled') is not None:
-                        sampled = True
-                    fobj.write(json.dumps(result, separators=(',', ':')) + '\n')
-                    yield result
-        except:
-            os.unlink(path + '.tmp')
-            raise
-        if False and sampled:
-            # Don't cache sampled results
-            os.unlink(path + '.tmp')
-        else:
-            os.rename(path + '.tmp', path)
-
-    return wrapped
-
-
 class GAClient(object):
-    def __init__(self):
-        self._last_request = None
+    def __init__(self, afm, cache_manager):
+        self.afm = afm
+        self.cache_manager = cache_manager
+
+        # A mapping from readable profile names to the profile ID.
+        self.profile_ids = {
+            'search': 'ga:56562468',
+        }
+
+        # Last time that a request was made.  Used to avoid hitting GA too
+        # frequently.
+        self._last_request = time.time()
 
         # Worst sampling rate that we've seen.  None if none seen.
         # Callers of the client may reset this to None, and read it.
@@ -70,38 +39,18 @@ class GAClient(object):
         # Time until we can trust that GA has processed the data.
         self.ga_latency = timedelta(hours=4)
 
-    def _ensure_init_ga(self):
-        """Initialise GA connection if not already done.
+    def oauth_client(self):
+        if getattr(self, '_oauth_client', None) is None:
+            self._oauth_client = open_client(self.afm)
+        return self._oauth_client
 
-        Looks up profile ids, etc.
+    def build_ga_params(self, profile_name, date, kwargs):
+        """Build parameters for making a call to GA.
 
         """
-        if self._last_request is not None:
-            return
-        try:
-            self.service = perform_auth()
-            self.profiles = {
-                'search': get_profile(
-                    self.service, 'www.gov.uk', 'UA-26179049-1',
-                    'Q. Site search (entire site with query strings)'),
-            }
-        except AccessTokenRefreshError:
-            logger.exception(
-                "Credentials error initialising GA access",
-            )
-            raise GAError("Credentials error initialising GA access")
-        except HttpError as error:
-            logger.exception(
-                "HTTP error initialising GA access: %s: %s",
-                error.resp.status, error._get_reason(),
-            )
-            raise GAError("HTTP error initialising GA access")
-        self._last_request = time.time()
-
-    def build_ga_params(self, profile_name, ga_date, kwargs):
-        profile = self.profiles[profile_name]
+        ga_date = date.strftime("%Y-%m-%d")
         params = dict(
-            ids='ga:' + profile['profile_id'],
+            ids=self.profile_ids[profile_name],
             start_date=ga_date,
             end_date=ga_date,
             samplingLevel="HIGHER_PRECISION",
@@ -110,6 +59,25 @@ class GAClient(object):
         params.update(kwargs)
         return params
 
+    def _rate_limit(self):
+        """Rate limit requests by simplest possible means.
+
+        """
+        since = time.time() - self._last_request
+        if since < 1:
+            time.sleep(1.0 - since)
+        self._last_request = time.time()
+
+    def _check_ga_latency(self, date):
+        now = datetime.now()
+        if date + timedelta(days=1) + self.ga_latency > now:
+            # We're not grouping by hour, so can't rely on any of the data.
+            raise RuntimeError(
+                "Can't reliably get data from GA for this day (%s) yet." % (
+                    date.isoformat(),
+                )
+            )
+
     @cached_iterator
     def _fetch_from_ga(self, profile_name, date, name_map, kwargs):
         """Call GA with the given profile, date and args.
@@ -117,38 +85,18 @@ class GAClient(object):
         Yield an iterator of the result.
 
         """
-        self._ensure_init_ga()
-
-        # Rate limit by simplest possible means.
-        since = time.time() - self._last_request
-        if since < 1:
-            time.sleep(1.0 - since)
-        self._last_request = time.time()
-
-        ga_date = date.strftime("%Y-%m-%d")
-
-        now = datetime.now()
-        latest_hour = None
-        if date + timedelta(days=1) + self.ga_latency > now:
-            # Some data for the selected date is not yet reliably available.
-            if "ga:hour" in kwargs.get('dimensions', ''):
-                # Grouping by hour, so can rely on some of the old hours.
-                latest_hour = ((now - self.ga_latency).hour + 23) % 24
-                if latest_hour < 0:
-                    return
-            else:
-                # We're not grouping by hour, so can't rely on any of the data.
-                return
+        self._check_ga_latency(date)
+        self._rate_limit()
+        params = self.build_ga_params(profile_name, date, kwargs)
 
         try:
-            params = self.build_ga_params(profile_name, ga_date, kwargs)
-
             start_index = 1
             while True:
-                resp = self.service.query.get_raw_response(
+                resp = self.oauth_client().query.get_raw_response(
                     start_index=start_index,
                     **params
                 )
+
                 if resp.get('containsSampledData'):
                     sample_size = int(resp.get('sampleSize', 0))
                     sample_space = int(resp.get('sampleSpace', 1))
@@ -161,6 +109,7 @@ class GAClient(object):
                 else:
                     sample_rate = None
                 total_results = resp['totalResults']
+
                 headers = [
                     name_map.get(header['name'][3:], header['name'][3:])
                     for header in resp['columnHeaders']
@@ -182,11 +131,8 @@ class GAClient(object):
                     if 'hour' in ret:
                         hour = int(ret['hour'])
                         ret['hour'] = hour
-                        if latest_hour is not None and hour > latest_hour:
-                            return None
                     if sample_rate:
                         ret['sampled'] = sample_rate
-
                     return ret
 
                 rows = resp.get('rows', ())
@@ -213,6 +159,9 @@ class GAClient(object):
             )
             raise GAError("HTTP error fetching data from GA")
 
+    @staticmethod
+    def _remove_time_components_from_date(date):
+        return datetime(year=date.year, month=date.month, day=date.day)
 
     def fetch(self, profile_name, date, name_map=None, **kwargs):
         """Fetch some metrics.
@@ -238,8 +187,7 @@ class GAClient(object):
         if name_map is None:
             name_map = {}
 
-        # Remove time components from date, if it has any.
-        date = datetime(year=date.year, month=date.month, day=date.day)
+        date = self._remove_time_components_from_date(date)
 
         for row in self._fetch_from_ga(profile_name, date, name_map, kwargs):
             sample_rate = row.get('sampled')

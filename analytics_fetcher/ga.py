@@ -2,7 +2,6 @@
 
 """
 
-from .ga_client import GAClient, GAError
 from collections import Counter
 from urlparse import urlparse, parse_qs
 import hashlib
@@ -12,7 +11,6 @@ import re
 import unicodedata
 
 
-__all__ = ['GAData', 'GAError']
 logger = logging.getLogger(__name__)
 linkpos_re = re.compile('\Aposition=(?P<pos>[0-9]+)(?:&sublink=(?P<sublink>[^&]+))?\Z')
 
@@ -174,8 +172,8 @@ class SearchAggregator(object):
 
 
 class GAData(object):
-    def __init__(self, date):
-        self.client = GAClient()
+    def __init__(self, ga_client, date):
+        self.client = ga_client
         self.date = date
         self.date_idstr = date.strftime("%Y%m%d")
         self.date_str = '%04d-%02d-%02dT00:00:00Z' % (

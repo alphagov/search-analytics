@@ -4,7 +4,7 @@ from collections import Counter
 import datetime
 
 
-def fetch_page_traffic(today, days_ago_buckets):
+def fetch_page_traffic(ga_client, today, days_ago_buckets):
     """Fetches page traffic for recent time periods.
 
     :param days_ago_buckets: A list of integers representing days_ago to fetch
@@ -24,7 +24,7 @@ def fetch_page_traffic(today, days_ago_buckets):
     }
     for days_ago in range(1, oldest_days_ago + 1):
         date = today - datetime.timedelta(days=days_ago)
-        data = GAData(date)
+        data = GAData(ga_client, date)
         raw_traffic = data.fetch_traffic_info()
         traffic = page_traffic(raw_traffic)
         for buckets_days_ago, bucket in traffic_buckets.items():

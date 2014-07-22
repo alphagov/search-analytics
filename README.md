@@ -71,3 +71,11 @@ This will generate a file called `page-traffic.dump`, which is in elasticsearch
 bulk load format, and can be loaded into the search index using the `bulk_load`
 script in rummager.  This contains information on the amount of traffic each
 page on GOV.UK got (after some normalisation).
+
+The fetching script fetches data from GA by making requests for each day's
+data.  It caches the results for each day, so that it doesn't need to repeat
+all the requests when run on a subsequent day.  By default, the cache is placed
+in a directory "cache" at the top level of a checkout.  The location of the
+cache can be controlled by passing a path in the `CACHE_DIR` environment
+variable.  Entries which are older than 30 days will be removed from the cache
+at the end of each run of the fetch script.
