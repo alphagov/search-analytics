@@ -42,7 +42,7 @@ class AtomicFileCreate(object):
     def __exit__(self, exc, value, tb):
         self.fobj.close()
         if exc is None:
-            os.rename(self.tmppath, os.path.join(dirname, filename))
+            os.rename(self.tmppath, os.path.join(self.dirname, self.filename))
         else:
             os.unlink(self.tmppath)
         return False
