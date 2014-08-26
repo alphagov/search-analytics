@@ -2,6 +2,7 @@
 
 """
 
+
 def path_components(path):
     result = []
     if path.startswith('/'):

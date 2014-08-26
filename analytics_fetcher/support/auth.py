@@ -120,7 +120,7 @@ class AuthFileManager(object):
 
 def calc_env_var(client_secrets_path):
     """Calculate an environment variable value holding auth information.
-    
+
     Performs the initial auth flow and then encodes the resulting secrets
     appropriately.
 
@@ -129,7 +129,7 @@ def calc_env_var(client_secrets_path):
         client_secrets = json.load(fobj)
     with AuthFileManager() as afm:
         afm.set_data("client_secrets.json", client_secrets)
-        client = open_client(afm)
+        open_client(afm)
         return afm.to_env_var()
 
 
