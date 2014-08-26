@@ -27,6 +27,7 @@ AuthFileManager context is exited.  ie, if the secrets had been passed in the
 
 """
 
+from .utils import base64, to_json
 import gapy.client
 import json
 import logging
@@ -38,14 +39,6 @@ import zlib
 
 
 logger = logging.getLogger(__name__)
-
-
-def base64(s):
-    return s.encode('base64').replace("\n", "")
-
-
-def to_json(obj):
-    return json.dumps(obj, separators=(',', ':'))
 
 
 class AuthFileManager(object):
