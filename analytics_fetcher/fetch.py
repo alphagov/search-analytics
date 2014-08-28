@@ -1,7 +1,30 @@
 from .analysis import page_traffic
+from .makebulk import page_info_docs
+from .support.ga_client import ClientContext
 from .ga import GAData
 from collections import Counter
 import datetime
+import json
+import os
+
+
+def fetch(outfile, days_ago):
+    if os.path.exists(outfile):
+        raise ValueError("Output file %r already exists" % outfile)
+
+    with ClientContext(cache_days=30) as client:
+        traffic_by_page = fetch_page_traffic(
+            client,
+            datetime.date.today(),
+            [days_ago],
+        )
+
+    with open(outfile, "wb") as fobj:
+        for action, data in page_info_docs(traffic_by_page):
+            fobj.write("%s\n%s\n" % (
+                json.dumps(action, separators=(',', ':')),
+                json.dumps(data, separators=(',', ':'))
+            ))
 
 
 def fetch_page_traffic(ga_client, today, days_ago_buckets):

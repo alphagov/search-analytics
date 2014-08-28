@@ -2,12 +2,16 @@
 
 """
 
-from analytics_fetcher.support.auth import open_client
-from analytics_fetcher.support.cache_manager import cached_iterator
+from analytics_fetcher.support.auth import open_client, AuthFileManager
+from analytics_fetcher.support.cache_manager import (
+    cached_iterator,
+    CacheManager,
+)
 from apiclient.errors import HttpError
 from datetime import datetime, timedelta
 from oauth2client.client import AccessTokenRefreshError
 import logging
+import os
 import time
 
 
@@ -197,3 +201,23 @@ class GAClient(object):
             ):
                 self.worst_sample_rate = sample_rate
             yield row
+
+
+class ClientContext(object):
+    def __init__(self, cache_days):
+        self.cache_days = cache_days
+        self.afm = None
+        self.cache_manager = None
+
+    def __enter__(self):
+        assert self.afm is None
+        assert self.cache_manager is None
+        self.afm = AuthFileManager()
+        self.afm.__enter__()
+        self.afm.from_env_var(os.environ["GAAUTH"])
+        self.cache_manager = CacheManager(self.cache_days)
+        return GAClient(self.afm, self.cache_manager)
+
+    def __exit__(self, exc, value, tb):
+        self.cache_manager.cleanup()
+        return self.afm.__exit__(exc, value, tb)
