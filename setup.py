@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+
 try:
     from setuptools import setup
 except ImportError:
@@ -19,7 +21,7 @@ requires = [
 try:
     long_description = open(
         os.path.join(os.path.dirname(__file__), 'README.md')).read()
-except:
+except IOError:
     long_description = None
 
 setup(

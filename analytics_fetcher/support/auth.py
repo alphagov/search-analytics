@@ -27,6 +27,7 @@ AuthFileManager context is exited.  ie, if the secrets had been passed in the
 
 """
 
+from .utils import base64, to_json
 import gapy.client
 import json
 import logging
@@ -38,14 +39,6 @@ import zlib
 
 
 logger = logging.getLogger(__name__)
-
-
-def base64(s):
-    return s.encode('base64').replace("\n", "")
-
-
-def to_json(obj):
-    return json.dumps(obj, separators=(',', ':'))
 
 
 class AuthFileManager(object):
@@ -120,7 +113,7 @@ class AuthFileManager(object):
 
 def calc_env_var(client_secrets_path):
     """Calculate an environment variable value holding auth information.
-    
+
     Performs the initial auth flow and then encodes the resulting secrets
     appropriately.
 
@@ -129,7 +122,7 @@ def calc_env_var(client_secrets_path):
         client_secrets = json.load(fobj)
     with AuthFileManager() as afm:
         afm.set_data("client_secrets.json", client_secrets)
-        client = open_client(afm)
+        open_client(afm)
         return afm.to_env_var()
 
 
