@@ -1,3 +1,6 @@
+set -e
+set -o pipefail
+
 if [ \! -d ENV ]; then virtualenv ENV; fi
 . ENV/bin/activate
 pip install -r requirements.txt
