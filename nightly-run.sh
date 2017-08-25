@@ -12,6 +12,8 @@ ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; govuk_setenv rummager bundle 
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; LOG_FAILED_LINKS_LOOKUP_AND_CONTINUE=1 RUMMAGER_INDEX=mainstream govuk_setenv rummager bundle exec rake rummager:migrate_index)'
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; LOG_FAILED_LINKS_LOOKUP_AND_CONTINUE=1 RUMMAGER_INDEX=detailed govuk_setenv rummager bundle exec rake rummager:migrate_index)'
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; LOG_FAILED_LINKS_LOOKUP_AND_CONTINUE=1 RUMMAGER_INDEX=government govuk_setenv rummager bundle exec rake rummager:migrate_index)'
-ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; LOG_FAILED_LINKS_LOOKUP_AND_CONTINUE=1 RUMMAGER_INDEX=govuk govuk_setenv rummager bundle exec rake rummager:update_popularity)'
+
+ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; RUMMAGER_INDEX=govuk govuk_setenv rummager bundle exec rake rummager:update_popularity)'
+ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; govuk_setenv rummager bundle exec rake rummager:sync_govuk)'
 
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; LOG_FAILED_LINKS_LOOKUP_AND_CONTINUE=1 RUMMAGER_INDEX=all govuk_setenv rummager bundle exec rake rummager:clean)'
