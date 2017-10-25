@@ -63,9 +63,10 @@ Fetching data
 
 Ensure that the virtualenv is activated, and then run:
 
-    GAAUTH='...' PYTHONPATH=. python scripts/fetch.py page-traffic.dump
+    GAAUTH='...' PYTHONPATH=. python scripts/fetch.py page-traffic.dump 14
 
-(Where `GAAUTH` is the values obtained from the `setup_auth.py` script.)
+(Where `GAAUTH` is the value obtained from the `setup_auth.py` script, and
+the final argument `14` is the number of days to fetch analytics data for.)
 
 This will generate a file called `page-traffic.dump`, which is in elasticsearch
 bulk load format, and can be loaded into the search index using the `bulk_load`
