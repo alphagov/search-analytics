@@ -10,10 +10,10 @@ PYTHONPATH=. python scripts/fetch.py page-traffic.dump 14
 SEARCH_NODE=$(/usr/local/bin/govuk_node_list -c search --single-node)
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; govuk_setenv rummager bundle exec ./bin/page_traffic_load)' < page-traffic.dump
 
-ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=mainstream govuk_setenv rummager bundle exec rake rummager:update_popularity)'
-ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=detailed govuk_setenv rummager bundle exec rake rummager:update_popularity)'
-ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=government govuk_setenv rummager bundle exec rake rummager:update_popularity)'
-ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; RUMMAGER_INDEX=govuk govuk_setenv rummager bundle exec rake rummager:update_popularity)'
+ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=mainstream CONFIRM_INDEX_MIGRATION_START=true govuk_setenv rummager bundle exec rake rummager:migrate_schema)'
+ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=detailed CONFIRM_INDEX_MIGRATION_START=true govuk_setenv rummager bundle exec rake rummager:migrate_schema)'
+ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=government CONFIRM_INDEX_MIGRATION_START=true govuk_setenv rummager bundle exec rake rummager:migrate_schema)'
+ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; RUMMAGER_INDEX=govuk CONFIRM_INDEX_MIGRATION_START=true govuk_setenv rummager bundle exec rake rummager:migrate_schema)'
 
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; govuk_setenv rummager bundle exec rake rummager:sync_govuk)'
 
