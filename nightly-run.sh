@@ -2,7 +2,7 @@
 set -e
 set -o pipefail
 
-if [ -z $SKIP_TRAFFIC_LOAD ]; then
+if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
   if [ \! -d ENV ]; then virtualenv ENV; fi
   . ENV/bin/activate
   pip install -r requirements.txt
