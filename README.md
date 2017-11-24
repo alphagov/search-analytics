@@ -5,7 +5,6 @@ This code extracts analytics data from google analytics and processes it such
 that it can be used by the site search on gov.uk for improving search result
 quality.
 
-
 Installation
 ------------
 
@@ -45,7 +44,7 @@ but in summary:
  - Run the following command to generate the refresh token.
 
        PYTHONPATH=. python scripts/setup_auth.py /path/to/client_secrets.json
- 
+
    It will display a url which you'll need to open with a browser that's signed
    in to the google account that the client JSON was downloaded from; paste the
    result into the prompt.  The command will output (to stdout) a "GAAUTH"
@@ -80,3 +79,15 @@ in a directory "cache" at the top level of a checkout.  The location of the
 cache can be controlled by passing a path in the `CACHE_DIR` environment
 variable.  Entries which are older than 30 days will be removed from the cache
 at the end of each run of the fetch script.
+
+Running popularity update without retrieving GA data
+----------------------------------------------------
+
+When running the full script on integration and staging it is desirable that
+we don't retrieve new data from GA.
+
+This can be achieved with the following command:
+
+```bash
+./nightly-run.sh SKIP_TRAFFIC_LOAD=true
+```
