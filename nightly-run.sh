@@ -17,5 +17,3 @@ ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGE
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=detailed govuk_setenv rummager bundle exec rake rummager:update_popularity)'
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; PROCESS_ALL_DATA=true RUMMAGER_INDEX=government govuk_setenv rummager bundle exec rake rummager:update_popularity)'
 ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; RUMMAGER_INDEX=govuk govuk_setenv rummager bundle exec rake rummager:update_popularity)'
-
-ssh deploy@${SEARCH_NODE} '(cd /var/apps/rummager; govuk_setenv rummager bundle exec rake rummager:sync_govuk)'
