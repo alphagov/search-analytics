@@ -4,7 +4,7 @@ set -o pipefail
 
 SEARCH_NODE=$(/usr/local/bin/govuk_node_list -c search --single-node)
 if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
-  if [ \! -d ENV ]; then virtualenv ENV; fi
+  if [ \! -d ENV ]; then virtualenv -p /opt/python2.7/bin/python ENV; fi
   . ENV/bin/activate
   pip install -r requirements.txt
   rm -f page-traffic.dump
