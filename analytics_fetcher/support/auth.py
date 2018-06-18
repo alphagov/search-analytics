@@ -127,18 +127,23 @@ def calc_env_var(client_secrets_path):
 
 
 def open_client(afm):
-    """Open an oauth2client.
+    """
+    Open an oauth2client.
 
     :param afm: an AuthFileManager which will be used to lookup the filenames
     needed.
-
     """
-    # Prevent oauth2client from trying to open a browser
-    # This is run from inside the VM so there is no browser
-    oauth2client.tools.FLAGS.auth_local_webserver = False
+
+    # Usually this would be an object that came from
+    # https://github.com/google/oauth2client/blob/master/oauth2client/tools.py#L77
+    # but here we can trick it by passing a class instance with the same attributes.
+    class Flags:
+        logging_level = 'ERROR'
+        noauth_local_webserver = True
 
     return gapy.client.from_secrets_file(
         afm.path("client_secrets.json"),
         storage_path=afm.path("storage.json"),
         readonly=True,
+        flags=Flags(),
     )
