@@ -18,5 +18,15 @@ if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
 fi
 
 ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true RUMMAGER_INDEX=detailed govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:update_popularity)"
+
+# Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
+# taking up lots of Redis memory
+sleep 2400
+
 ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true RUMMAGER_INDEX=government govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:update_popularity)"
+
+# Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
+# taking up lots of Redis memory
+sleep 2400
+
 ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; RUMMAGER_INDEX=govuk govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:update_popularity)"
