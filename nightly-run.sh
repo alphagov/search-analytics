@@ -14,19 +14,19 @@ if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
   rm -f page-traffic.dump
   PYTHONPATH=. python scripts/fetch.py page-traffic.dump 14
   ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec ./bin/page_traffic_load)" < page-traffic.dump
-  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:clean RUMMAGER_INDEX=page-traffic)"
+  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:clean SEARCH_INDEX=page-traffic)"
 fi
 
-ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true RUMMAGER_INDEX=detailed govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:update_popularity)"
+ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true SEARCH_INDEX=detailed govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
 
 # Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
 # taking up lots of Redis memory
 sleep 2400
 
-ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true RUMMAGER_INDEX=government govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:update_popularity)"
+ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true SEARCH_INDEX=government govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
 
 # Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
 # taking up lots of Redis memory
 sleep 2400
 
-ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; RUMMAGER_INDEX=govuk govuk_setenv ${TARGET_APPLICATION} bundle exec rake rummager:update_popularity)"
+ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; SEARCH_INDEX=govuk govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
