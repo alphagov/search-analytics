@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 if [[ -z $TARGET_APPLICATION ]]; then
-  TARGET_APPLICATION=rummager
+  TARGET_APPLICATION=search-api
 fi
 
 SEARCH_NODE=$(/usr/local/bin/govuk_node_list -c search --single-node)
