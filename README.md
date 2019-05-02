@@ -69,7 +69,7 @@ the final argument `14` is the number of days to fetch analytics data for.)
 
 This will generate a file called `page-traffic.dump`, which is in elasticsearch
 bulk load format, and can be loaded into the search index using the `bulk_load`
-script in rummager.  This contains information on the amount of traffic each
+script in search-api.  This contains information on the amount of traffic each
 page on GOV.UK got (after some normalisation).
 
 The fetching script fetches data from GA by making requests for each day's
