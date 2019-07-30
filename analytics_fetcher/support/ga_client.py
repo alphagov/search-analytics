@@ -120,7 +120,7 @@ class GAClient(object):
                 ]
                 header_types = [
                     {
-                        'STRING': unicode,
+                        'STRING': str,
                         'INTEGER': int,
                         'PERCENT': float,
                     }[header['dataType']]
@@ -128,10 +128,10 @@ class GAClient(object):
                 ]
 
                 def makerow(row):
-                    ret = dict(zip(
+                    ret = dict(list(zip(
                         headers,
                         (header_type(value)
-                         for (header_type, value) in zip(header_types, row))))
+                         for (header_type, value) in zip(header_types, row)))))
                     if 'hour' in ret:
                         hour = int(ret['hour'])
                         ret['hour'] = hour

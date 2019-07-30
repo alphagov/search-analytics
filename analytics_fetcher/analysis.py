@@ -22,7 +22,7 @@ def page_traffic(raw_traffic):
     result = Counter()
 
     # Add up traffic to urls which normalise to the same thing.
-    for path, (traffic, erroring) in raw_traffic.iteritems():
+    for path, (traffic, erroring) in raw_traffic.items():
         if erroring:
             continue
         path = normalise_path(path)

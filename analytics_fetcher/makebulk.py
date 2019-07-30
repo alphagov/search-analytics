@@ -13,7 +13,7 @@ def path_components(path):
 
 
 def page_info_docs(traffic_by_page):
-    for page, info in traffic_by_page.iteritems():
+    for page, info in traffic_by_page.items():
         action = {
             "index": {
                 "_type": "page-traffic",
@@ -23,7 +23,7 @@ def page_info_docs(traffic_by_page):
         data = {
             "path_components": path_components(page),
         }
-        for days_ago, (rank, views, views_frac) in info.items():
+        for days_ago, (rank, views, views_frac) in list(info.items()):
             data["rank_%i" % days_ago] = rank
             data["vc_%i" % days_ago] = views
             data["vf_%i" % days_ago] = views_frac

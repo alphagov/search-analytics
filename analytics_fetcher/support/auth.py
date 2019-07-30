@@ -101,7 +101,7 @@ class AuthFileManager(object):
         self._check_entered()
         value = [
             [key, self.data(key)]
-            for key in self.paths.keys()
+            for key in list(self.paths.keys())
         ]
         return base64(zlib.compress(to_json(value), 9))
 
