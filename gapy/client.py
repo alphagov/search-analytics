@@ -45,7 +45,7 @@ def from_private_key(account_name, private_key=None, private_key_path=None,
         if not private_key_path:
             raise GapyError(
                 "Must provide either a private_key or a private_key_file")
-        if isinstance(private_key_path, basestring):
+        if isinstance(private_key_path, str):
             private_key_path = open(private_key_path)
         private_key = private_key_path.read()
 

@@ -1,2 +1,2 @@
-class GapyError(StandardError):
+class GapyError(Exception):
     pass

@@ -1,11 +1,11 @@
 from datetime import datetime
-import urlparse
+import urllib.parse
 
 
 def parse_ga_url(url):
     escape_semicolons = url.replace(";", "%3B")
-    query = urlparse.parse_qsl(
-        urlparse.urlparse(escape_semicolons).query)
+    query = urllib.parse.parse_qsl(
+        urllib.parse.urlparse(escape_semicolons).query)
     return dict(
         (key.replace("-", "_"), values) for key, values in query)
 
@@ -45,7 +45,7 @@ class QueryResponse(BaseResponse):
             for row in self._response.get("rows", []):
                 result = {
                     "metrics": dict(
-                        zip(self._metrics, row[len(self._dimensions):])),
+                        list(zip(self._metrics, row[len(self._dimensions):]))),
                     "start_date": datetime.strptime(
                         self._response["query"]["start-date"],
                         "%Y-%m-%d").date(),
@@ -55,7 +55,7 @@ class QueryResponse(BaseResponse):
 
                 if self._dimensions:
                     result["dimensions"] = dict(
-                        zip(self._dimensions, row[:len(self._dimensions)]))
+                        list(zip(self._dimensions, row[:len(self._dimensions)])))
                     self._add_datetime(result["dimensions"])
 
                 count += 1
