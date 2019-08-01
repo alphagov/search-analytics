@@ -25,8 +25,8 @@ def parse_args(argv):
 def main(argv):
     options = parse_args(argv)
     value = calc_env_var(options['client_secrets_path'])
-    print
-    print "GAAUTH='%s'" % (value, )
+    print()
+    print("GAAUTH='%s'" % (value, ))
     return False
 
 

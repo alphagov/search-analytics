@@ -1,0 +1,2 @@
+class GapyError(Exception):
+    pass
