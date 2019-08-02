@@ -27,7 +27,7 @@ AuthFileManager context is exited.  ie, if the secrets had been passed in the
 
 """
 
-from .utils import base64, to_json
+from .utils import base64_encode, base64_decode, to_json
 import gapy.client
 import json
 import logging
@@ -103,11 +103,11 @@ class AuthFileManager(object):
             [key, self.data(key)]
             for key in list(self.paths.keys())
         ]
-        return base64(zlib.compress(to_json(value), 9))
+        return base64_encode(zlib.compress(to_json(value), 9))
 
     def from_env_var(self, value):
         self._check_entered()
-        for key, value in json.loads(zlib.decompress(value.decode('base64'))):
+        for key, value in json.loads(zlib.decompress(base64_decode(value))):
             self.set_data(key, value)
 
 
