@@ -95,7 +95,7 @@ class AuthFileManager(object):
 
     def set_data(self, key, value):
         with open(self.path(key), 'wb') as fobj:
-            fobj.write(to_json(value))
+            fobj.write(to_json(value).encode('ascii'))
 
     def to_env_var(self):
         self._check_entered()
