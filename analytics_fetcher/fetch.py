@@ -21,10 +21,10 @@ def fetch(outfile, days_ago):
 
     with open(outfile, "wb") as fobj:
         for action, data in page_info_docs(traffic_by_page):
-            fobj.write("%s\n%s\n" % (
+            fobj.write(("%s\n%s\n" % (
                 json.dumps(action, separators=(',', ':')),
                 json.dumps(data, separators=(',', ':'))
-            ))
+            )).encode('ascii'))
 
 
 def fetch_page_traffic(ga_client, today, days_ago_buckets):

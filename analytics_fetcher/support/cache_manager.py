@@ -97,7 +97,7 @@ def cached_iterator(fn):
 
     """
     def wrapped(self, *args, **kwargs):
-        h = hashlib.sha1(repr([args, kwargs])).hexdigest()
+        h = hashlib.sha1(repr([args, kwargs]).encode('ascii')).hexdigest()
         if self.cache_manager.exists(h):
             logger.info("Serving GA request from cache")
             with self.cache_manager.open_for_read(h) as fobj:
