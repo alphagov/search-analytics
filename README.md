@@ -8,7 +8,7 @@ quality.
 Installation
 ------------
 
-Requires python 2.7.
+Requires python 3.4.
 
     virtualenv ENV
     source ENV/bin/activate
