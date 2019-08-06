@@ -107,7 +107,7 @@ class AuthFileManager(object):
 
     def from_env_var(self, value):
         self._check_entered()
-        for key, value in json.loads(zlib.decompress(base64_decode(value))):
+        for key, value in json.loads(zlib.decompress(base64_decode(value)).decode('ascii')):
             self.set_data(key, value)
 
 
