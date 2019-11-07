@@ -1,5 +1,5 @@
 argparse==1.2.1
-cryptography==2.0.3
+cryptography==2.3
 google-api-python-client==1.4.2
 httplib2==0.11.3
 oauth2client==1.5.2
