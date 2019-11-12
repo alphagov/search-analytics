@@ -10,6 +10,7 @@ SEARCH_NODE=$(/usr/local/bin/govuk_node_list -c search --single-node)
 if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
   if [ \! -d ENV ]; then virtualenv -p /usr/bin/python3 ENV; fi
   . ENV/bin/activate
+  pip install --upgrade setuptools
   pip install -r requirements.txt
   rm -f page-traffic.dump
   PYTHONPATH=. python3 scripts/fetch.py page-traffic.dump 14
