@@ -197,6 +197,7 @@ class GAClient(object):
             sample_rate = row.get('sampled')
             if (
                 self.worst_sample_rate is None or
+                sample_rate is None or
                 self.worst_sample_rate > sample_rate
             ):
                 self.worst_sample_rate = sample_rate
