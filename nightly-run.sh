@@ -2,36 +2,58 @@
 set -e
 set -o pipefail
 
-if [[ -z $TARGET_APPLICATION ]]; then
-  TARGET_APPLICATION=search-api
+function fetchanalytics {
+  if [[ -z $TARGET_APPLICATION ]]; then
+    TARGET_APPLICATION=search-api
+  fi
+
+  SEARCH_NODE=$(/usr/local/bin/govuk_node_list -c search --single-node)
+  if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
+    docker run --rm -e GAAUTH="$GAAUTH" -v "$(pwd)/:/govuk-search-analytics" -e CURRENT_USER="$(id -u ${USER})" -e CURRENT_GROUP="$(id -g ${USER})" python:3.8.0 bash -c """
+    cd /govuk-search-analytics
+    pip install -r requirements.txt
+    rm -f page-traffic.dump
+    python3 scripts/fetch.py page-traffic.dump 14
+    chown -R "\${CURRENT_USER}:\${CURRENT_GROUP}" .
+    """
+
+    ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec ./bin/page_traffic_load)" < page-traffic.dump
+    ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:clean SEARCH_INDEX=page-traffic)"
+  fi
+
+  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true SEARCH_INDEX=detailed govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
+
+  # Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
+  # taking up lots of Redis memory
+  echo "Going to sleep for 40 minutes to let the Sidekiq jobs get processed"
+  sleep 2400
+
+  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true SEARCH_INDEX=government govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
+
+  # Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
+  # taking up lots of Redis memory
+  echo "Going to sleep for a second time (40 minutes again) to let the Sidekiq jobs get processed"
+  sleep 2400
+
+  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; SEARCH_INDEX=govuk govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
+  return
+}
+
+# This script runs on the jenkins machine
+if fetchanalytics; then
+  #run success passive check
+  NSCA_CHECK_DESCRIPTION="Fetch analytics data for Search API"
+  NSCA_OUTPUT="Fetch analytics data for Search API succeeded"
+  IPADDRESS=$(facter ipaddress_eth0)
+  NSCA_CODE=0
+  echo "Sending success passive check"
+  printf "$IPADDRESS\t$NSCA_CHECK_DESCRIPTION\t$NSCA_CODE\t$NSCA_OUTPUT\n" | /usr/sbin/send_nsca -H alert >/dev/null
+else
+  #run failure passive check
+  NSCA_CHECK_DESCRIPTION="Fetch analytics data for Search API"
+  NSCA_OUTPUT="Fetch analytics data for Search API failed"
+  IPADDRESS=$(facter ipaddress_eth0)
+  NSCA_CODE=1
+  echo  "Sending failure passive check"
+  printf "$IPADDRESS\t$NSCA_CHECK_DESCRIPTION\t$NSCA_CODE\t$NSCA_OUTPUT\n" | /usr/sbin/send_nsca -H alert >/dev/null
 fi
-
-SEARCH_NODE=$(/usr/local/bin/govuk_node_list -c search --single-node)
-if [[ -z $SKIP_TRAFFIC_LOAD ]]; then
-  docker run --rm -e GAAUTH="$GAAUTH" -v "$(pwd)/:/govuk-search-analytics" -e CURRENT_USER="$(id -u ${USER})" -e CURRENT_GROUP="$(id -g ${USER})" python:3.8.0 bash -c """
-  cd /govuk-search-analytics
-  pip install -r requirements.txt
-  rm -f page-traffic.dump
-  python3 scripts/fetch.py page-traffic.dump 14
-  chown -R "\${CURRENT_USER}:\${CURRENT_GROUP}" .
-  """
-
-  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec ./bin/page_traffic_load)" < page-traffic.dump
-  ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:clean SEARCH_INDEX=page-traffic)"
-fi
-
-ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true SEARCH_INDEX=detailed govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
-
-# Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
-# taking up lots of Redis memory
-echo "Going to sleep for 40 minutes to let the Sidekiq jobs get processed"
-sleep 2400
-
-ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; PROCESS_ALL_DATA=true SEARCH_INDEX=government govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
-
-# Wait 40 minutes, to let the Sidekiq jobs be processed to avoid
-# taking up lots of Redis memory
-echo "Going to sleep for a second time (40 minutes again) to let the Sidekiq jobs get processed"
-sleep 2400
-
-ssh deploy@${SEARCH_NODE} "(cd /var/apps/${TARGET_APPLICATION}; SEARCH_INDEX=govuk govuk_setenv ${TARGET_APPLICATION} bundle exec rake search:update_popularity)"
