@@ -1,4 +1,4 @@
-argparse==1.2.1
+argparse==1.4.0
 cryptography==2.3
 google-api-python-client==1.4.2
 httplib2==0.18.0
