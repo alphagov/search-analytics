@@ -13,7 +13,7 @@ packages = [
 
 requires = [
     "requests==2.24.0",
-    "pytest==2.5.2",
+    "pytest==5.4.3",
     "mock==1.0.1",
     "gapy==0.0.9",
 ]
