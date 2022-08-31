@@ -4,7 +4,3 @@ updates:
     directory: /
     schedule:
       interval: daily
-    allow:
-      # Framework gems
-      - dependency-name: google-api-python-client
-        dependency-type: direct
