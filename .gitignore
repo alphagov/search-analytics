@@ -1,6 +1,10 @@
 *.pyc
-ENV
+venv
 build
 cache
 client_secrets.json
 generated_secrets
+.coverage
+__pycache__
+.vscode
+stop
