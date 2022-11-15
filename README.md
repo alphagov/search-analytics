@@ -8,15 +8,37 @@ quality.
 Installation
 ------------
 
-Requires python 3.4.
+For developing and testing locally, it is recommended that you use the same
+Python version as the one set in `nightly-run.sh` currently this is `3.8.13`.
 
-    virtualenv ENV
-    source ENV/bin/activate
-    pip install -r requirements.txt
+To achieve this - if you do not already have this version available - is by
+using [`pyenv`](https://github.com/pyenv/pyenv). `pyenv` should be familiar
+to anyone who has used `rbenv` - in fact it is a clone of `rbenv` so shares
+many of the same commands and concepts.
 
-Note for those unfamiliar with virtualenv: the "source ENV/bin/activate" line
-will need to be run in each shell that you want to run the scripts in this
-repository from.
+Once `pyenv` is installed and the above version is installed (`pyenv install 3.8.13`),
+you should be able to `cd` into the root of the project where `pyenv` will read
+the `.python-version` file and load the correct version.
+
+From there you can issue the following commands to load a Python virtual environment and
+install the dependencies. Run `deactivate` at anytime to exit the Python virtual
+environment.
+
+```bash
+$ python -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+```
+
+Testing, coverage and linting
+-----------------------------
+
+```bash
+$ python -m unittest discover
+$ coverage run -m unittest discover
+$ coverage report -m
+$ pylint --recursive=y ./analytics_fetcher
+```
 
 Authentication with Google Analytics
 ------------------------------------
