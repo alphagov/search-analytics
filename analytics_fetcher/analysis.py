@@ -1,7 +1,23 @@
+"""Utilities for turning page traffic data into
+    a simplified and reduced list.
+    Example traffic data...
+    {
+        '/fred': [250, False],
+        '/fred?partner=wilma': [250, False]
+    }
+    Result...
+    Counter(
+        {
+            '/fred': 500
+        }
+    )
+"""
+
 from collections import Counter
 
 
 def normalise_path(path):
+    """Reduces a given URL to a base path"""
     if not path.startswith('/'):
         return None
     # Ignore pages within smart answers.  We can identify smart answers by
@@ -19,6 +35,13 @@ def normalise_path(path):
 
 
 def page_traffic(raw_traffic):
+    """Agregates a number of records in the form:
+        [URL, hit_count, is_erroring] to be a
+        Counter containing records in the form:
+        { "/base_path", total_hit_count }.
+        Ignores all records where the url is
+        erroring.
+    """
     result = Counter()
 
     # Add up traffic to urls which normalise to the same thing.
