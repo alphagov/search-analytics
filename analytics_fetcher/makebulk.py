@@ -40,7 +40,7 @@ def page_info_docs(traffic_by_page):
             "path_components": path_components(page),
         }
         for days_ago, (rank, views, views_frac) in list(info.items()):
-            data["rank_%i" % days_ago] = rank
-            data["vc_%i" % days_ago] = views
-            data["vf_%i" % days_ago] = views_frac
+            data[f"rank_{days_ago}"] = rank
+            data[f"vc_{days_ago}"] = views
+            data[f"vf_{days_ago}"] = views_frac
         yield action, data
