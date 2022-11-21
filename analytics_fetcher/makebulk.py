@@ -4,6 +4,8 @@
 
 
 def path_components(path):
+    """Creates an array with the base path and all given paths.
+    """
     result = []
     if path.startswith('/'):
         components = path.lstrip('/').split('/')
@@ -13,6 +15,20 @@ def path_components(path):
 
 
 def page_info_docs(traffic_by_page):
+    """Creates a result set containing two elements.
+        First element contains the action details,
+        and the second the data details. Both are
+        dict's.
+
+        Example traffic data...
+        { "/fred": { 1: [1, 10, 0.1] } }
+
+        Result: action...
+        { "index": {"_type": "page-traffic", "_id": "/fred"} }
+
+        Result: data...
+        { "path_components": ["/fred"], "rank_1": 1, "vc_1": 10, "vf_1": 0.1 }
+    """
     for page, info in traffic_by_page.items():
         action = {
             "index": {
