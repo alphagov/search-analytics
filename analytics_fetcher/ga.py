@@ -1,9 +1,34 @@
 """Provide access to google analytics data for search.
 
+    Example data...
+    [
+        {
+            'path': '/fred',
+            'views': 100,
+            'title': 'ignored'
+        },
+        {
+            'path': '/fred',
+            'views': 200,
+            'title': 'ignored'
+        },
+        {
+            'path': '/wilma',
+            'views': 200,
+            'title': 'ignored'
+        }
+    ]
+
+    Result...
+    {
+        '/fred': [300, False],
+        '/wilma': [200, False]
+    }
 """
 
 
 class GAData(object):
+    """Gets page view data via the Google API"""
     def __init__(self, ga_client, date):
         self.client = ga_client
         self.date = date
@@ -19,7 +44,7 @@ class GAData(object):
 
         Returns a dict keyed by path.  Values are a tuple of:
 
-         - total number of views (unique per session)
+         - total number of views (unique per path)
          - boolean: True iff the page consistently returns a not found error.
 
         """
