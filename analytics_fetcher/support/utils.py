@@ -2,13 +2,14 @@ from base64 import b64encode, b64decode
 import json
 
 
-def base64_encode(bs):
+def base64_encode(byte_string):
     """Convert bytes to base64"""
-    return b64encode(bs).replace("\n", "")
+    return b64encode(byte_string).replace(b"\n", b"")
 
-def base64_decode(s):
+
+def base64_decode(string):
     """Convert an ASCII base64 string to bytes"""
-    return b64decode(s.encode('ascii'))
+    return b64decode(string.encode('ascii'))
 
 
 def to_json(obj):
