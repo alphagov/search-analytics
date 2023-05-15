@@ -1,4 +1,4 @@
-name: "Review users"
+name: "Export analytics"
 
 on:
   schedule:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  review-users:
+  export-analytics:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
