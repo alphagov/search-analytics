@@ -29,3 +29,13 @@ jobs:
         env:
           GAAUTH: ${{ secrets.GAAUTH }}
         run: "python scripts/fetch.py page-traffic.dump 14"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::172025368201:role/search_analytics_github_action_role
+          aws-region: eu-west-1
+
+      - name: Copy analytics to S3
+        run: |
+          aws s3 cp page-traffic.dump s3://govuk-search-analytics-production/page-traffic.dump
