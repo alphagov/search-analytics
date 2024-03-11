@@ -1,6 +1,6 @@
 asn1crypto==1.4.0
 certifi==2024.2.2
-cffi==1.14.1
+cffi==1.16.0
 chardet==3.0.4
 coverage==6.5.0
 cryptography==42.0.4
