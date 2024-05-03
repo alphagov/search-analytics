@@ -1,7 +1,7 @@
 asn1crypto==1.5.1
 certifi==2024.2.2
 cffi==1.16.0
-chardet==3.0.4
+chardet==5.2.0
 coverage==6.5.0
 cryptography==42.0.5
 google-api-python-client==2.85.0
