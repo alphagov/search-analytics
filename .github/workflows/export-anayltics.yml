@@ -1,8 +1,9 @@
 name: "Export analytics"
 
 on:
-  schedule:
-    - cron:  '5 4 * * *'
+  push:
+  # schedule:
+  #   - cron:  '5 4 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -38,4 +39,4 @@ jobs:
 
       - name: Copy analytics to S3
         run: |
-          aws s3 cp page-traffic.dump s3://govuk-search-analytics-production/page-traffic.dump
+          aws s3 cp page-traffic.dump s3://govuk-search-analytics-production/page-traffic.dump.test
