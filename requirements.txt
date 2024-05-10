@@ -10,7 +10,7 @@ idna==2.10
 oauth2client==1.5.2
 pip==24.0
 pyasn1==0.4.8
-pyasn1-modules==0.2.8
+pyasn1-modules==0.4.0
 pycparser==2.20
 pyOpenSSL==19.1.0
 pylint==2.15.3
