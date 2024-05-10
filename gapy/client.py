@@ -83,6 +83,7 @@ def from_secrets_file(client_secrets, storage=None, flags=None,
                                    scope=scope)
     storage = _get_storage(storage, storage_path)
     credentials = storage.get()
+    print(credentials.client_id)
     if credentials is None or credentials.invalid:
         credentials = run_flow(flow, storage, flags)
 
