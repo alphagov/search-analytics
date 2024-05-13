@@ -139,7 +139,9 @@ def open_client(afm):
     # but here we can trick it by passing a class instance with the same attributes.
     class Flags:
         logging_level = 'ERROR'
-        noauth_local_webserver = True
+        noauth_local_webserver = False
+        auth_host_port = [8080, 8090]
+        auth_host_name = 'localhost'
 
     return gapy.client.from_secrets_file(
         afm.path("client_secrets.json"),
