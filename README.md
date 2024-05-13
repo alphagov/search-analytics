@@ -116,3 +116,8 @@ The fields are:
 - `rank_%i`: the position of that page after sorting by `vc_%i` descending.
 - `vc_%i`: the number of page views in the day range.
 - `vf_%i`: the `vc_%i` of the page divided by the sum of the `vc_%i` values for all pages.
+
+Licence
+-------
+
+[MIT License](LICENCE)
