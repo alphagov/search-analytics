@@ -6,7 +6,7 @@ coverage==6.5.0
 cryptography==3.3.2
 google-api-python-client==2.85.0
 httplib2==0.19.0
-idna==2.10
+idna==3.7
 oauth2client==1.5.2
 pip==24.0
 pyasn1==0.4.8
