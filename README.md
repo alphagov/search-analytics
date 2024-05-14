@@ -8,15 +8,9 @@ quality.
 Installation
 ------------
 
-For developing and testing locally, it is recommended that you use the same
-Python version as the one set in `nightly-run.sh` currently this is `3.8.13`.
+For developing and testing locally, use [`pyenv`](https://github.com/pyenv/pyenv).
 
-To achieve this - if you do not already have this version available - is by
-using [`pyenv`](https://github.com/pyenv/pyenv). `pyenv` should be familiar
-to anyone who has used `rbenv` - in fact it is a clone of `rbenv` so shares
-many of the same commands and concepts.
-
-Once `pyenv` is installed and the above version is installed (`pyenv install 3.8.13`),
+Once `pyenv` is installed and the necessary python version is installed (`pyenv install`)
 you should be able to `cd` into the root of the project where `pyenv` will read
 the `.python-version` file and load the correct version.
 
@@ -42,6 +36,8 @@ $ pylint --recursive=y ./analytics_fetcher
 
 Authentication with Google Analytics
 ------------------------------------
+
+**⚠️  This guide is out of date and we're not sure what to update it to **
 
 To make the data-fetch from Google Analytics work, you'll need to fetch a
 `client_secrets.json` file from google containing credentials, and use that to
@@ -101,18 +97,6 @@ in a directory "cache" at the top level of a checkout.  The location of the
 cache can be controlled by passing a path in the `CACHE_DIR` environment
 variable.  Entries which are older than 30 days will be removed from the cache
 at the end of each run of the fetch script.
-
-Running popularity update without retrieving GA data
-----------------------------------------------------
-
-When running the full script on integration and staging it is desirable that
-we don't retrieve new data from GA.
-
-This can be achieved with the following command:
-
-```bash
-./nightly-run.sh SKIP_TRAFFIC_LOAD=true
-```
 
 The dump format
 ---------------
