@@ -1,6 +1,9 @@
 Search analytics processing for GOV.UK
 ======================================
 
+**⚠️ This project makes use of Google Universal Analytics that is [due to
+be switched off on July 1st 2024](https://support.google.com/analytics/answer/11583528)**
+
 This code extracts analytics data from google analytics and processes it such
 that it can be used by the site search on gov.uk for improving search result
 quality.
@@ -37,43 +40,39 @@ $ pylint --recursive=y ./analytics_fetcher
 Authentication with Google Analytics
 ------------------------------------
 
-**⚠️  This guide is out of date and we're not sure what to update it to **
+**⚠️  This guide does not represent best practices for Google API authentication -
+it is constrained by legacy libraries**
 
 To make the data-fetch from Google Analytics work, you'll need to fetch a
 `client_secrets.json` file from google containing credentials, and use that to
 generate a refresh token.  This refresh token must then be passed to the script
-via an environment variable.
+via an environment variable. This token will be associated with your individual
+Google account.
 
-Some details on generating these credentials are given in [the GA
-tutorial](https://developers.google.com/analytics/solutions/articles/hello-analytics-api),
-but in summary:
+If you need to create a token:
 
- - create (or already have) a google account with access to the google
-   analytics profile for www.gov.uk.
- - create a project in [the google developers
-   console](https://console.developers.google.com/project)
- - For the project, go to the "APIs & auth" section on the dashboard, and
-   ensure that the "Analytics API" is turned on.
- - Go to the "Credentials" section on the dashboard, and click the "Create New
-   Client ID" button, to create a new OAuth 2.0 client ID.
- - Pick the "Installed Application" option, and a type of "other"
- - Download the JSON for the newly created client (using the "Download JSON"
-   button underneath it).
- - Run the following command to generate the refresh token.
+- Check that your google account has access to GOV.UK Universal Analytics and
+  to the appropriate analytics profile (56562468)
+- Get access to the GDS GCP project: search-api-app
+- Go to "APIs and services", then "Credentials"
+- Download the "Search API v1 developer permission" OAuth client credentials,
+  which will give you a client_secrets.json file
+- Run the following command to generate the refresh token.
 
-       PYTHONPATH=. python scripts/setup_auth.py /path/to/client_secrets.json
+     PYTHONPATH=. python scripts/setup_auth.py /path/to/client_secrets.json
 
-   It will display a url which you'll need to open with a browser that's signed
-   in to the google account that the client JSON was downloaded from; paste the
-   result into the prompt.  The command will output (to stdout) a "GAAUTH"
-   environment variable value which needs to be set when calling the fetching
-   script.
- - Delete the `client_secrets.json` file after use - it shouldn't be needed
-   again, and this ensures it doesn't get leaked (eg, by committing it to git).
- - Run the fetch script (`scripts/fetch.py`) with environment variables set.
-   See below for details.
- - Don't commit any of the generated secrets to this git repo!  For regular
-   runs from Jenkins, pass the environment variables in from the Jenkins jobs.
+  It will display a url which you'll need to open with a browser that's signed
+  in to the google account that the client JSON was downloaded from; paste the
+  result into the prompt.  The command will output (to stdout) a "GAAUTH"
+  environment variable value which needs to be set when calling the fetching
+  script.
+- Delete the `client_secrets.json` file after use - it shouldn't be needed
+  again, and this ensures it doesn't get leaked (eg, by committing it to git).
+- Run the fetch script (`scripts/fetch.py`) with environment variables set.
+  See below for details.
+- If needed, update the GitHub Action to have your new value for the GAAUTH
+  secret
+- Don't commit any of the generated secrets to this git repo
 
 Fetching data
 -------------
@@ -117,3 +116,8 @@ The fields are:
 - `rank_%i`: the position of that page after sorting by `vc_%i` descending.
 - `vc_%i`: the number of page views in the day range.
 - `vf_%i`: the `vc_%i` of the page divided by the sum of the `vc_%i` values for all pages.
+
+Licence
+-------
+
+[MIT License](LICENCE)

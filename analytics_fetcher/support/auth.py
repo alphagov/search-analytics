@@ -103,7 +103,7 @@ class AuthFileManager(object):
             [key, self.data(key)]
             for key in list(self.paths.keys())
         ]
-        return base64_encode(zlib.compress(to_json(value), 9))
+        return base64_encode(zlib.compress(to_json(value).encode('ascii'), 9)).decode('ascii')
 
     def from_env_var(self, value):
         self._check_entered()
@@ -139,7 +139,9 @@ def open_client(afm):
     # but here we can trick it by passing a class instance with the same attributes.
     class Flags:
         logging_level = 'ERROR'
-        noauth_local_webserver = True
+        noauth_local_webserver = False
+        auth_host_port = [8080, 8090]
+        auth_host_name = 'localhost'
 
     return gapy.client.from_secrets_file(
         afm.path("client_secrets.json"),
