@@ -1,8 +1,8 @@
 Search analytics processing for GOV.UK
 ======================================
 
-**⚠️ This project makes use of Google Universal Analytics that is [due to
-be switched off on July 1st 2024](https://support.google.com/analytics/answer/11583528)**
+**⚠️ This project was archived on July 3rd 2024 following the [Google Universal
+Analytics switch off](https://support.google.com/analytics/answer/11583528)**
 
 This code extracts analytics data from google analytics and processes it such
 that it can be used by the site search on gov.uk for improving search result
